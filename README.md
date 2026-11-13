@@ -12,6 +12,10 @@ npm start
 
 Ouvrir ensuite <http://localhost:4173>. Pour choisir un autre port, définir la variable d’environnement `PORT` avant de lancer le serveur.
 
+## Déploiement Vercel
+
+Le fichier `vercel.json` configure Vercel pour le preset `Other`, sans étape de compilation, avec les fichiers statiques servis depuis la racine. Le projet est relié au dépôt GitHub sur la branche `main` ; chaque nouveau commit déclenche un déploiement.
+
 Le serveur Node fourni sert les fichiers vidéo d’origine avec prise en charge des requêtes HTTP Range pour la lecture et la recherche dans la vidéo. Les fichiers restent à la racine du projet pour que leurs URL relatives fonctionnent aussi après publication de l’ensemble du dossier sur un hébergeur statique compatible.
 
 ## Fonctionnement des données
