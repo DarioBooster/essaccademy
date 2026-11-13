@@ -17,19 +17,19 @@
         ctx.fillStyle='#fffdf5'; ctx.fillRect(0,0,WIDTH,HEIGHT);
         ctx.strokeStyle='#b99935';ctx.lineWidth=9;ctx.strokeRect(23,23,WIDTH-46,HEIGHT-46);ctx.lineWidth=2;ctx.strokeRect(43,43,WIDTH-86,HEIGHT-86);
         if(logo.naturalWidth)ctx.drawImage(logo,85,82,330,78);
-        ctx.textAlign='right';ctx.fillStyle='#82703a';ctx.font='16px Arial,sans-serif';ctx.fillText('ESS ACADEMY',1305,102);ctx.font='14px Arial,sans-serif';ctx.fillText(`CERTIFICATION N\u00b0 ${learner.certificate}`,1305,128);
-        ctx.textAlign='center';ctx.fillStyle='#a08025';ctx.font='bold 21px Arial,sans-serif';ctx.fillText('C E R T I F I C A T   D E   R E U S S I T E',WIDTH/2,256);
-        ctx.fillStyle='#77736a';ctx.font='italic 22px Georgia,serif';ctx.fillText('Ce certificat est d\u00e9cern\u00e9 \u00e0',WIDTH/2,328);
-        ctx.fillStyle='#214d3d';fittedFont(ctx,learner.name,1100,72,38,'Georgia,serif');ctx.fillText(learner.name,WIDTH/2,423);
+        ctx.textAlign='right';ctx.fillStyle='#82703a';ctx.font='16px Poppins,sans-serif';ctx.fillText('ESS ACADEMY',1305,102);ctx.font='14px Poppins,sans-serif';ctx.fillText(`CERTIFICATION N\u00b0 ${learner.certificate}`,1305,128);
+        ctx.textAlign='center';ctx.fillStyle='#a08025';ctx.font='bold 21px Poppins,sans-serif';ctx.fillText('C E R T I F I C A T   D E   R E U S S I T E',WIDTH/2,256);
+        ctx.fillStyle='#77736a';ctx.font='italic 22px Poppins,sans-serif';ctx.fillText('Ce certificat est d\u00e9cern\u00e9 \u00e0',WIDTH/2,328);
+        ctx.fillStyle='#214d3d';fittedFont(ctx,learner.name,1100,72,38,'Poppins,sans-serif');ctx.fillText(learner.name,WIDTH/2,423);
         ctx.strokeStyle='#b7a66c';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(405,455);ctx.lineTo(995,455);ctx.stroke();
-        ctx.fillStyle='#77736a';ctx.font='italic 19px Georgia,serif';ctx.fillText('pour avoir compl\u00e9t\u00e9 avec succ\u00e8s la formation',WIDTH/2,497);
-        ctx.fillStyle='#214d3d';fittedFont(ctx,'Fondamentaux de l\u2019\u00c9conomie',1080,43,28,'Georgia,serif');ctx.fillText('Fondamentaux de l\u2019\u00c9conomie',WIDTH/2,555);fittedFont(ctx,'Sociale et Solidaire',1080,43,28,'Georgia,serif');ctx.fillText('Sociale et Solidaire',WIDTH/2,607);
-        ctx.fillStyle='#77736a';ctx.font='17px Arial,sans-serif';ctx.fillText(`D\u00e9livr\u00e9 le ${new Date().toLocaleDateString('fr-FR')} \u00b7 Score final : ${learner.finalScore} %`,WIDTH/2,657);
-        ctx.strokeStyle='#9c9271';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(125,797);ctx.lineTo(462,797);ctx.moveTo(938,797);ctx.lineTo(1275,797);ctx.stroke();ctx.fillStyle='#374d4a';ctx.font='italic 19px Georgia,serif';ctx.fillText('Direction p\u00e9dagogique',293,831);ctx.fillText('Programme ESS',1107,831);ctx.fillStyle='#203b49';ctx.font='bold 16px Arial,sans-serif';ctx.fillText('ESS Academy',293,857);ctx.fillText('ESS Academy',1107,857);
-        ctx.beginPath();ctx.arc(WIDTH/2,820,58,0,Math.PI*2);ctx.strokeStyle='#b99935';ctx.lineWidth=4;ctx.stroke();ctx.beginPath();ctx.arc(WIDTH/2,820,47,0,Math.PI*2);ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#8a7023';ctx.font='bold 15px Arial,sans-serif';ctx.fillText('ESS',WIDTH/2,815);ctx.font='bold 12px Arial,sans-serif';ctx.fillText('VALID\u00c9',WIDTH/2,838);
+        ctx.fillStyle='#77736a';ctx.font='italic 19px Poppins,sans-serif';ctx.fillText('pour avoir compl\u00e9t\u00e9 avec succ\u00e8s la formation',WIDTH/2,497);
+        ctx.fillStyle='#214d3d';fittedFont(ctx,'Fondamentaux de l\u2019\u00c9conomie',1080,43,28,'Poppins,sans-serif');ctx.fillText('Fondamentaux de l\u2019\u00c9conomie',WIDTH/2,555);fittedFont(ctx,'Sociale et Solidaire',1080,43,28,'Poppins,sans-serif');ctx.fillText('Sociale et Solidaire',WIDTH/2,607);
+        ctx.fillStyle='#77736a';ctx.font='17px Poppins,sans-serif';ctx.fillText(`D\u00e9livr\u00e9 le ${new Date().toLocaleDateString('fr-FR')} \u00b7 Score final : ${learner.finalScore} %`,WIDTH/2,657);
+        ctx.strokeStyle='#9c9271';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(125,797);ctx.lineTo(462,797);ctx.moveTo(938,797);ctx.lineTo(1275,797);ctx.stroke();ctx.fillStyle='#374d4a';ctx.font='italic 19px Poppins,sans-serif';ctx.fillText('Direction p\u00e9dagogique',293,831);ctx.fillText('Programme ESS',1107,831);ctx.fillStyle='#203b49';ctx.font='bold 16px Poppins,sans-serif';ctx.fillText('ESS Academy',293,857);ctx.fillText('ESS Academy',1107,857);
+        ctx.beginPath();ctx.arc(WIDTH/2,820,58,0,Math.PI*2);ctx.strokeStyle='#b99935';ctx.lineWidth=4;ctx.stroke();ctx.beginPath();ctx.arc(WIDTH/2,820,47,0,Math.PI*2);ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#8a7023';ctx.font='bold 15px Poppins,sans-serif';ctx.fillText('ESS',WIDTH/2,815);ctx.font='bold 12px Poppins,sans-serif';ctx.fillText('VALID\u00c9',WIDTH/2,838);
         canvas.dataset.rendered='true';resolve();
       };
-      logo.onload=paint;logo.onerror=paint;logo.src='./assets/ESS_Academy_logo_HD.png';if(logo.complete)paint();
+      logo.onload=()=>{document.fonts.ready.then(paint)};logo.onerror=()=>{document.fonts.ready.then(paint)};logo.src='./assets/ESS_Academy_logo_HD.png';if(logo.complete)paint();
     });
   }
   function buildPdf(jpeg) {
