@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Agricultrices dans un champ d’ananas</title>
+  <desc id="desc">Deux agricultrices noires récoltent des ananas au milieu d’un champ tropical.</desc>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#f3c777"/><stop offset=".58" stop-color="#f6e3ad"/><stop offset="1" stop-color="#a9c783"/></linearGradient>
+    <linearGradient id="dress" x2="0" y2="1"><stop stop-color="#e65b3b"/><stop offset="1" stop-color="#b8312d"/></linearGradient>
+    <linearGradient id="dress2" x2="0" y2="1"><stop stop-color="#386d89"/><stop offset="1" stop-color="#22495f"/></linearGradient>
+    <linearGradient id="skin" x2=".4" y2="1"><stop stop-color="#78432d"/><stop offset="1" stop-color="#48291f"/></linearGradient>
+    <linearGradient id="fruit" x2=".8" y2="1"><stop stop-color="#f6bd48"/><stop offset="1" stop-color="#d9832c"/></linearGradient>
+    <pattern id="cloth" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(28)"><path d="M0 4h24M0 16h24" stroke="#f3cb73" stroke-width="5" opacity=".7"/><circle cx="12" cy="10" r="2" fill="#fff0c4"/></pattern>
+    <pattern id="basket" width="18" height="18" patternUnits="userSpaceOnUse"><path d="M0 5h18M0 14h18M5 0v18" stroke="#8a512b" stroke-width="2" opacity=".6"/></pattern>
+  </defs>
+  <rect width="1200" height="1200" fill="url(#sky)"/>
+  <circle cx="942" cy="170" r="88" fill="#ffe9a9" opacity=".9"/>
+  <path d="M0 395q180-100 360 0t360 0q220-115 480 0v255H0z" fill="#769763"/>
+  <path d="M0 493q205-106 414 4t385-3q210-95 401 0v170H0z" fill="#567c52"/>
+  <path d="M0 580q175-60 349 0t346 0q210-75 505 0v620H0z" fill="#537c49"/>
+  <path d="M0 690q260-55 520 18t680-18M0 815q285-70 560 12t640-12M0 950q265-60 570 5t630-8" fill="none" stroke="#9ab66b" stroke-width="12" opacity=".75"/>
+  <g opacity=".82" fill="#245e3b">
+    <path d="M65 672q-22-116-73-164 91 37 106 133 23-102 101-145-44 64-54 171z"/><path d="M1020 640q11-100 68-160-86 44-99 135-18-93-96-132 47 61 46 157z"/>
+    <path d="M222 839q-18-92-70-129 77 26 92 105 18-82 84-117-35 56-39 130z"/><path d="M1006 867q9-94 66-137-77 30-91 111-22-84-91-115 42 55 42 132z"/>
+  </g>
+  <!-- Pineapple plants and fruit -->
+  <g>
+    <g transform="translate(75 1000)"><path d="M70 126Q-8 36 12 4q47 30 68 85Q63 5 94-32q20 56-1 112 16-116 62-125 2 74-40 131 58-78 97-66-28 70-104 99z" fill="#285b3d"/><ellipse cx="81" cy="99" rx="43" ry="56" fill="url(#fruit)"/><path d="M41 79l78 41M39 102l80 42M54 58l61 76M110 52L52 134" stroke="#a96729" stroke-width="5" opacity=".8"/></g>
+    <g transform="translate(944 1002) scale(.95)"><path d="M68 125Q-8 39 10 4q49 30 68 84Q62 6 95-33q19 55-2 112 17-116 62-125 2 73-40 131 57-77 96-66-26 68-103 99z" fill="#2a603e"/><ellipse cx="80" cy="99" rx="42" ry="55" fill="url(#fruit)"/><path d="M40 78l78 41M39 103l78 42M54 57l61 78M109 50l-58 84" stroke="#a96729" stroke-width="5" opacity=".8"/></g>
+    <g transform="translate(370 1025) scale(.72)"><path d="M72 120Q-8 37 8 0q50 28 73 86Q61 5 92-34q22 58 0 116 18-119 64-127 1 75-42 133 58-79 98-66-28 70-105 99z" fill="#285b3d"/><ellipse cx="81" cy="98" rx="42" ry="54" fill="url(#fruit)"/></g>
+    <g transform="translate(740 1065) scale(.62)"><path d="M71 120Q-8 38 10 0q49 30 70 86Q62 5 94-34q20 58-1 116 18-119 64-127 1 75-42 133 58-79 98-66-28 70-105 99z" fill="#285b3d"/><ellipse cx="81" cy="98" rx="42" ry="54" fill="url(#fruit)"/></g>
+  </g>
+  <!-- Left farmer -->
+  <g>
+    <path d="M285 1200q20-166 64-267 48-83 131-78 96 4 131 98 33 94 52 247z" fill="url(#dress)"/>
+    <path d="M296 1200q18-115 50-185l300 15 25 170z" fill="url(#cloth)" opacity=".75"/>
+    <path d="M423 844q-42-12-52-58l-9-78 124-9 19 94q-25 51-82 51z" fill="url(#skin)"/>
+    <ellipse cx="438" cy="633" rx="110" ry="139" fill="url(#skin)"/>
+    <path d="M331 609q-31-143 88-181 108-35 179 67l-24 107q-42-63-98-71-59 64-145 78z" fill="#243c31"/>
+    <path d="M321 601q-44-119 29-194 62-64 161-34 93 28 110 134-72-45-147-37-69 8-153 131z" fill="#e7a93e"/>
+    <path d="M335 492q94 55 273 17M322 536q109 58 295 18M337 446q104 47 222 27" fill="none" stroke="#f5d27a" stroke-width="18"/>
+    <path d="M404 643q16-12 31 0M480 643q17-12 31 0" stroke="#231d1b" stroke-width="8" stroke-linecap="round"/>
+    <path d="M425 711q27 22 56-2" fill="none" stroke="#e4a985" stroke-width="8" stroke-linecap="round"/>
+    <path d="M337 738q91 70 190-8" fill="none" stroke="#f0bd4a" stroke-width="9"/>
+    <path d="M391 955q43-61 99-58l75 100-40 50-107-42z" fill="#71452b"/><path d="M386 957q55-31 97 7l-20 93q-53 35-103 0z" fill="url(#basket)"/>
+    <path d="M403 932q-1-60 41-83 38 24 41 80-37 23-82 3z" fill="url(#fruit)"/><path d="M440 860q-32-45-22-72 30 15 37 47 12-55 39-60-4 42-26 69 39-30 57-16-22 35-58 41z" fill="#347044"/>
+  </g>
+  <!-- Right farmer -->
+  <g>
+    <path d="M671 1200q20-161 58-259 40-85 131-92 89 0 135 87 46 87 71 264z" fill="url(#dress2)"/>
+    <path d="M675 1200q21-109 51-178l305 12 32 166z" fill="url(#cloth)" opacity=".55"/>
+    <path d="M807 858q-36-21-42-64l8-80 128 6-2 91q-29 54-92 47z" fill="url(#skin)"/>
+    <ellipse cx="852" cy="650" rx="105" ry="136" fill="url(#skin)"/>
+    <path d="M746 616q-22-127 66-183 105-64 203 21l27 114q-71-65-134-58-64 53-162 106z" fill="#252c2a"/>
+    <path d="M731 609q-27-108 46-168 81-65 178-20 61 28 79 106-145-40-303 82z" fill="#bf573d"/>
+    <path d="M750 516q132 39 274 0M738 556q143 43 304 1M769 471q112 31 227 4" fill="none" stroke="#f0bb65" stroke-width="17"/>
+    <path d="M811 659q15-11 30 0M880 658q15-11 30 0" stroke="#231d1b" stroke-width="8" stroke-linecap="round"/>
+    <path d="M835 722q29 21 56-3" fill="none" stroke="#e4a985" stroke-width="8" stroke-linecap="round"/>
+    <path d="M780 756q70 64 145 8" fill="none" stroke="#f0bd4a" stroke-width="9"/>
+    <path d="M955 934q-2-54 38-81 44 22 49 78-40 27-87 3z" fill="url(#fruit)"/><path d="M985 861q-25-40-14-72 29 14 37 45 13-53 39-58-4 41-27 66 36-27 56-12-19 33-54 40z" fill="#347044"/>
+    <path d="M765 942q42-68 100-66 36 42 56 105l-53 41-120-29z" fill="#70452c"/><path d="M754 956q58-35 112 1l-9 98q-59 31-115-2z" fill="url(#basket)"/>
+    <path d="M777 930q0-54 40-78 42 21 45 78-39 23-85 0z" fill="url(#fruit)"/><path d="M805 862q-29-44-15-73 29 15 34 47 13-53 41-58-5 40-28 66 37-27 56-12-21 34-56 41z" fill="#347044"/>
+  </g>
+  <path d="M0 1140q190-55 390 0t405 0q204-60 405 0v60H0z" fill="#315e3b" opacity=".65"/>
+</svg>
