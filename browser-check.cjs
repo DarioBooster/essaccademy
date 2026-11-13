@@ -34,8 +34,9 @@ async function main() {
   await send('Page.navigate',{url:base+'/#home'});
   await waitFor('document.querySelector(".hero h1")');check('Home renders in Chrome',true);
   await waitFor('document.querySelectorAll(".module-card").length',n=>n===4);check('Home contains all four course modules',true);
+  check('Supplied logo loads in the home navigation',await evaluate('!!document.querySelector(".site-header .brand img")&&document.querySelector(".site-header .brand img").complete&&document.querySelector(".site-header .brand img").naturalWidth>0'));
   const visualAssets=await evaluate('Promise.all(["./assets/landing-photo.jpg","./assets/sanana-pineapple.jpg"].map(async u=>{const r=await fetch(u);return [r.status,r.headers.get("content-type")]}))');check('Cropped maquette photographs load with image MIME types',visualAssets.every(x=>x[0]===200&&x[1].includes('image/jpeg')));
-  await click('a[data-route="signup"]');await waitFor('document.querySelector("#signup-form")');
+  await click('a[data-route="signup"]');await waitFor('document.querySelector("#signup-form")');check('Supplied logo appears on the learner entry page',await evaluate('!!document.querySelector(".auth-form .brand img")&&document.querySelector(".auth-form .brand img").naturalWidth>0'));await click('.auth-form .brand');await waitFor('location.hash',v=>v==='#home');check('Learner entry logo returns to the home page',await evaluate('!!document.querySelector(".hero h1")'));await click('a[data-route="signup"]');await waitFor('document.querySelector("#signup-form")');
   await evaluate('document.querySelector("#learner-name").value="Aminata Diallo";document.querySelector("#learner-email").value="amina@example.test";document.querySelector("#signup-form").requestSubmit()');
   await waitFor('document.querySelector(".welcome h1")');check('Name-only learner entry reaches dashboard',await evaluate('document.body.innerText.includes("Aminata Diallo")'));
   await click('a[data-route="evaluation"]');check('Final evaluation stays locked until required modules are complete',await evaluate('document.body.innerText.includes("Terminez les trois premiers modules")&&!!document.querySelector("button[data-route=dashboard]")'));await click('button[data-route="dashboard"]');await waitFor('document.querySelector(".welcome h1")');check('Evaluation Quitter button returns to the dashboard',await evaluate('location.hash==="#dashboard"'));
@@ -75,6 +76,8 @@ async function main() {
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await sleep(250);
   const mobile=await evaluate('({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,menu:getComputedStyle(document.querySelector(".mobile-toggle")).display})');
   check('Profile layout fits a 390px mobile viewport',mobile.width===390&&mobile.scroll<=390&&mobile.menu!=='none');
+  check('Logo is present in the learner dashboard header',await evaluate('!!document.querySelector(".topbar .brand img")&&document.querySelector(".topbar .brand img").naturalWidth>0'));
+  await click('.topbar .brand');await waitFor('location.hash',v=>v==='#home');check('Dashboard logo returns to the home page',await evaluate('!!document.querySelector(".hero h1")'));
   await evaluate('location.hash="#home"');await waitFor('document.querySelector(".hero-visual")');
   const mobileHome=await evaluate('({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth})');check('Home layout fits a 390px mobile viewport',mobileHome.width===390&&mobileHome.scroll<=390);
   await click('#site-menu');check('Mobile navigation menu opens',await evaluate('document.querySelector("#site-nav").classList.contains("open")'));
