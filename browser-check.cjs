@@ -1,0 +1,91 @@
+'use strict';
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const {spawn} = require('node:child_process');
+
+const base = process.env.ESS_URL || 'http://localhost:4173';
+const candidates = [process.env.CHROME_PATH, 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'].filter(Boolean);
+const chrome = candidates.find(fs.existsSync);
+if (!chrome) throw new Error('Chrome or Edge was not found. Set CHROME_PATH to its executable.');
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'ess-academy-chrome-'));
+let proc;
+
+async function main() {
+  const checks = [];
+  const check = (name, ok) => { assert.ok(ok, name); checks.push(name); };
+  proc = spawn(chrome, ['--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check','--remote-debugging-port=0','--remote-allow-origins=*',`--user-data-dir=${profile}`,'--autoplay-policy=no-user-gesture-required','about:blank'], {stdio:'ignore',windowsHide:true});
+  const activePort = path.join(profile, 'DevToolsActivePort');
+  let port;
+  for (let i=0;i<100;i++) { if (fs.existsSync(activePort)) { port=Number(fs.readFileSync(activePort,'utf8').split(/\r?\n/)[0]); break; } await sleep(100); }
+  if (!port) throw new Error('Chrome DevTools did not start.');
+  const target = await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, {method:'PUT'}).then(r=>r.json());
+  const ws = new WebSocket(target.webSocketDebuggerUrl);
+  await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
+  let id=0;const pending=new Map(),runtimeErrors=[];
+  ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.method==='Runtime.exceptionThrown')runtimeErrors.push(m.params.exceptionDetails.text);if(m.id&&pending.has(m.id)){const p=pending.get(m.id);pending.delete(m.id);m.error?p.reject(new Error(m.error.message)):p.resolve(m.result);}};
+  const send=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;pending.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}));});
+  const evaluate=async expression=>{const r=await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true,userGesture:true});if(r.exceptionDetails)throw new Error(r.exceptionDetails.text);return r.result.value;};
+  const waitFor=async (expression,test=Boolean,timeout=8000)=>{const end=Date.now()+timeout;while(Date.now()<end){const v=await evaluate(expression);if(test(v))return v;await sleep(100);}throw new Error(`Timed out waiting for ${expression}`);};
+  const click=async selector=>{const exists=await evaluate(`!!document.querySelector(${JSON.stringify(selector)})`);if(!exists)throw new Error(`Missing clickable element ${selector}; route=${await evaluate('location.hash')}; page=${(await evaluate('document.body.innerText')).slice(0,600)}`);await evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);};
+  await send('Page.enable');await send('Runtime.enable');
+  await send('Page.navigate',{url:base+'/#home'});
+  await waitFor('document.querySelector(".hero h1")');check('Home renders in Chrome',true);
+  await waitFor('document.querySelectorAll(".module-card").length',n=>n===4);check('Home contains all four course modules',true);
+  const visualAssets=await evaluate('Promise.all(["./assets/landing-photo.jpg","./assets/sanana-pineapple.jpg"].map(async u=>{const r=await fetch(u);return [r.status,r.headers.get("content-type")]}))');check('Cropped maquette photographs load with image MIME types',visualAssets.every(x=>x[0]===200&&x[1].includes('image/jpeg')));
+  await click('a[data-route="signup"]');await waitFor('document.querySelector("#signup-form")');
+  await evaluate('document.querySelector("#learner-name").value="Aminata Diallo";document.querySelector("#learner-email").value="amina@example.test";document.querySelector("#signup-form").requestSubmit()');
+  await waitFor('document.querySelector(".welcome h1")');check('Name-only learner entry reaches dashboard',await evaluate('document.body.innerText.includes("Aminata Diallo")'));
+  await click('a[data-route="evaluation"]');check('Final evaluation stays locked until required modules are complete',await evaluate('document.body.innerText.includes("Terminez les trois premiers modules")&&!!document.querySelector("button[data-route=dashboard]")'));await click('button[data-route="dashboard"]');await waitFor('document.querySelector(".welcome h1")');check('Evaluation Quitter button returns to the dashboard',await evaluate('location.hash==="#dashboard"'));
+  await click('a[data-route="path"]');check('Course overview opens',await evaluate('document.body.innerText.includes("Devenez acteur de l’Économie Sociale et Solidaire")'));
+  await click('a[data-route="modules"]');check('Module list route opens',await evaluate('document.querySelectorAll(".module-card").length===4'));
+  await click('[data-module="1"]');await waitFor('document.querySelector("video")');
+  const video1=await waitFor('document.querySelector("video").readyState',v=>v>=1,15000);check('Module 1 video source loads metadata',video1>=1);
+  const videoInfo1=await evaluate('({src:document.querySelector("video source").src,duration:document.querySelector("video").duration,controls:document.querySelector("video").controls})');
+  check('Module 1 video has native controls and a valid duration',videoInfo1.controls&&videoInfo1.duration>0);
+  const play1=await evaluate('(async()=>{const v=document.querySelector("video");try{await v.play();const playing=!v.paused;v.pause();return playing&&v.paused}catch(e){return false}})()');check('Module 1 playback starts and pauses',play1);
+  const tail1=await evaluate('(async()=>{const v=document.querySelector("video"),t=Math.max(0,v.duration-.6);await new Promise(r=>{v.addEventListener("seeked",r,{once:true});v.currentTime=t;setTimeout(r,5000)});if(Math.abs(v.currentTime-t)>1.5)return false;try{await v.play()}catch{return false}await new Promise(r=>{if(v.ended)return r();v.addEventListener("ended",r,{once:true});setTimeout(r,4000)});return v.ended||v.currentTime>=v.duration-.5})()');check('Module 1 playback seeks to and reaches the end',tail1);
+  await send('Page.reload',{ignoreCache:true});await waitFor('!!document.querySelector("video")');await waitFor('document.querySelector("video").readyState',v=>v>=1,15000);check('Module 1 video remains available after page refresh',await evaluate('location.hash==="#lesson"&&document.querySelector("video source").src.includes("Module1")'));
+  for(const answer of [1,0,1]){await click(`[data-quiz-answer="${answer}"]`);await click('[data-action="answer-lesson"]');await sleep(900);}
+  await waitFor('location.hash',v=>v==='#modules');check('Module 1 quiz feedback and completion work',await evaluate('JSON.parse(localStorage.getItem("ess-academy-v1")).modules[1]===true'));
+  await click('[data-module="2"]');await waitFor('document.querySelector(".eyebrow").innerText',v=>v.includes('02'));
+  for(const answer of [1,0,1]){await click(`[data-quiz-answer="${answer}"]`);await click('[data-action="answer-lesson"]');await sleep(900);}
+  await waitFor('location.hash',v=>v==='#modules');check('Module 2 quiz and progress work',await evaluate('JSON.parse(localStorage.getItem("ess-academy-v1")).modules[2]===true'));
+  await click('[data-module="3"]');await waitFor('document.querySelector("video")');
+  const m3route=await evaluate('({hash:location.hash,module:JSON.parse(localStorage.getItem("ess-academy-v1")).module,text:document.querySelector("h1")?.innerText,button:document.querySelector("[data-module=\\"3\\"]")?.innerText})');check(`Module 3 opens its case introduction (${JSON.stringify(m3route)})`,m3route.hash==='#case'&&JSON.stringify(m3route).includes('SANANA'));
+  const video3=await waitFor('document.querySelector("video").readyState',v=>v>=1,15000);check('Module 3 video source loads on the SANANA case page',video3>=1);
+  const videoInfo3=await evaluate('({src:document.querySelector("video source").src,duration:document.querySelector("video").duration,controls:document.querySelector("video").controls})');
+  check('Module 3 video has native controls and a valid duration',videoInfo3.controls&&videoInfo3.duration>0);
+  const play3=await evaluate('(async()=>{const v=document.querySelector("video");try{await v.play();const playing=!v.paused;v.pause();return playing&&v.paused}catch(e){return false}})()');check('Module 3 playback starts and pauses',play3);
+  const tail3=await evaluate('(async()=>{const v=document.querySelector("video"),t=Math.max(0,v.duration-.6);await new Promise(r=>{v.addEventListener("seeked",r,{once:true});v.currentTime=t;setTimeout(r,5000)});if(Math.abs(v.currentTime-t)>1.5)return false;try{await v.play()}catch{return false}await new Promise(r=>{if(v.ended)return r();v.addEventListener("ended",r,{once:true});setTimeout(r,4000)});return v.ended||v.currentTime>=v.duration-.5})()');check('Module 3 playback seeks to and reaches the end',tail3);
+  await send('Page.reload',{ignoreCache:true});await waitFor('!!document.querySelector("video")');await waitFor('document.querySelector("video").readyState',v=>v>=1,15000);check('Module 3 video remains available after page refresh',await evaluate('location.hash==="#case"&&document.querySelector("video source").src.includes("Module%203")'));
+  await click('[data-route="workshop"]');
+  for(let i=0;i<5;i++){await click('[data-case-answer="0"]');await click('[data-action="case-next"]');await sleep(150);}
+  await waitFor('document.body.innerText.includes("ÉVALUATION FINALE")');check('SANANA workshop decisions advance and complete all five stages',await evaluate('JSON.parse(localStorage.getItem("ess-academy-v1")).modules[3]===true'));
+  for(const answer of [1,0,0,1,0]){await click(`[data-final-answer="${answer}"]`);await click('[data-action="final-next"]');await sleep(150);}
+  await waitFor('document.body.innerText.includes("Évaluation réussie")');check('Final assessment calculates a passing score',await evaluate('JSON.parse(localStorage.getItem("ess-academy-v1")).finalScore===100'));
+  await click('a[data-route="certificate"]');await waitFor('document.querySelector("#certificate")');
+  const certificateRef=await evaluate('JSON.parse(localStorage.getItem("ess-academy-v1")).certificate');check('Certificate displays learner, score and a generated reference',Boolean(certificateRef)&&await evaluate('document.querySelector("#certificate").innerText.includes("Aminata Diallo")'));
+  const downloads=path.join(profile,'downloads');fs.mkdirSync(downloads);await send('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:downloads});await click('[data-action="download-cert"]');
+  let pdf;for(let i=0;i<50;i++){const names=fs.readdirSync(downloads).filter(n=>n.endsWith('.pdf'));if(names.length){pdf=fs.readFileSync(path.join(downloads,names[0]));break;}await sleep(100);}check('Certificate downloads as a PDF file',Boolean(pdf&&pdf.subarray(0,8).toString('ascii').startsWith('%PDF-1.4')));
+  await evaluate('window.__shareUrl="";window.open=url=>window.__shareUrl=url');await click('[data-action="share-cert"]');check('LinkedIn share control opens a share URL for the certificate page',await evaluate('window.__shareUrl.startsWith("https://www.linkedin.com/sharing/share-offsite/?url=")'));
+  await click('a[data-route="profile"]');check('Profile shows saved learner data and all four completed modules',await evaluate('document.body.innerText.includes("Aminata Diallo")&&JSON.parse(localStorage.getItem("ess-academy-v1")).modules[4]===true'));
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await sleep(250);
+  const mobile=await evaluate('({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,menu:getComputedStyle(document.querySelector(".mobile-toggle")).display})');
+  check('Profile layout fits a 390px mobile viewport',mobile.width===390&&mobile.scroll<=390&&mobile.menu!=='none');
+  await evaluate('location.hash="#home"');await waitFor('document.querySelector(".hero-visual")');
+  const mobileHome=await evaluate('({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth})');check('Home layout fits a 390px mobile viewport',mobileHome.width===390&&mobileHome.scroll<=390);
+  await click('#site-menu');check('Mobile navigation menu opens',await evaluate('document.querySelector("#site-nav").classList.contains("open")'));
+  await click('#site-nav a[data-route="modules"]');await waitFor('location.hash',v=>v==='#modules');await click('[data-module="1"]');await waitFor('document.querySelector("video")');
+  const mobileVideo=await evaluate('({width:document.documentElement.clientWidth,video:document.querySelector("video").getBoundingClientRect().width})');check('Module video fits the 390px mobile viewport',mobileVideo.width===390&&mobileVideo.video<=390);
+  check('No uncaught JavaScript errors during the learner journey',runtimeErrors.length===0);
+  const tracks=file=>{const b=fs.readFileSync(path.join(__dirname,file)),p=b.indexOf(Buffer.from('moov')),size=b.readUInt32BE(p-4),moov=b.subarray(p+4,p-4+size).toString('latin1');return {video:/vide/.test(moov),audio:/soun|mp4a/.test(moov)};};
+  const sourceTracks={module1:tracks('ESS Academy Module1 caption anime.mp4'),module3:tracks('ESS Academy Module 3 caption anime.mp4')};
+  check('Original module 1 MP4 includes audio and video tracks',sourceTracks.module1.audio&&sourceTracks.module1.video);
+  check('Original module 3 MP4 includes its video track',sourceTracks.module3.video);
+  console.log(JSON.stringify({checks:checks.length,passed:checks,video1:videoInfo1,video3:videoInfo3,sourceTracks,mobile},null,2));
+  ws.close();
+}
+main().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>{if(proc)proc.kill();setTimeout(()=>{try{const resolved=path.resolve(profile);if(resolved.startsWith(path.resolve(os.tmpdir())+path.sep)&&path.basename(resolved).startsWith('ess-academy-chrome-'))fs.rmSync(resolved,{recursive:true,force:true});}catch{}},300);});
